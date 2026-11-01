@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="3DSolidFormer dataset: three-dimensional voxel geometries, nodal forces and supports, and finite-element displacement, equivalent strain, and von Mises stress fields.">
+  <meta name="theme-color" content="#354ca1">
+  <meta property="og:title" content="3DSolidFormer | Additive Intelligence Lab">
+  <meta property="og:description" content="High-resolution nodal datasets and full-field surrogate modeling for three-dimensional linear elasticity.">
+  <title>3DSolidFormer | Additive Intelligence Lab</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">{"imports":{"three":"./assets/vendor/three.module.js","three/addons/":"./assets/vendor/"}}</script>
+  <script src="assets/vendor/lucide.js" defer></script>
+  <script src="app.js" type="module"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="university-bar"><div class="content">Southern Methodist University <span>Lyle School of Engineering</span></div></div>
+  <header class="header">
+    <div class="header-inner content">
+      <a class="wordmark" href="#main">3DSolidFormer</a>
+      <nav aria-label="Main navigation" id="navigation">
+        <a href="#dataset">Dataset</a><a href="#explore">Example fields</a><a href="#method">Model and results</a><a href="#resources">Contact</a>
+      </nav>
+      <button class="icon-button menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="navigation" title="Open navigation"><i data-lucide="menu" aria-hidden="true"></i></button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="project-heading content" aria-labelledby="project-title">
+      <h1 id="project-title">3DSolidFormer</h1>
+      <p class="project-subtitle">High-resolution full-field prediction in three-dimensional linear elasticity</p>
+      <p class="hero-authors">David Guirguis</p>
+      <p class="hero-affiliation"><a href="https://additiveintel.ai" target="_blank" rel="noopener noreferrer">Additive Intelligence Lab</a></p>
+      <p class="affiliation-detail">Department of Mechanical Engineering, Southern Methodist University</p>
+      <p class="project-summary">The dataset contains three-dimensional voxel geometries, nodal loading and displacement constraints, and finite-element displacement, equivalent strain, and von Mises stress fields. The accompanying surrogate model predicts the five nodal response channels from geometry and boundary conditions.</p>
+      <div class="resource-actions">
+        <a class="button-primary dataset-link" href="https://bit.ly/3DSolidFormer" target="_blank" rel="noopener noreferrer"><i data-lucide="database" aria-hidden="true"></i>Access dataset</a>
+        <a class="text-link" href="dataset-guide.txt"><i data-lucide="file-text" aria-hidden="true"></i>Dataset documentation</a>
+      </div>
+    </section>
+
+    <section class="numbers content" aria-label="High-resolution study dataset">
+      <div><strong>75,114</strong><span>high-resolution cases retained for the study</span></div>
+      <div><strong>2.05 to 3.07 million</strong><span>elements per domain, including solid and void</span></div>
+      <div><strong>7</strong><span>rectangular domain shapes</span></div>
+    </section>
+
+    <section class="section content" id="dataset" aria-labelledby="dataset-heading">
+      <h2 id="dataset-heading">Dataset</h2>
+      <p class="section-intro">Each sample defines a linear-elastic boundary-value problem and its FEM solution. Source cases include topology-optimized material layouts and, where available, fully solid counterparts with the same domain, loads, and supports. The numeric identifier in each filename identifies the source case, while the suffix identifies its material variant.</p>
+
+      <div class="dataset-overview">
+        <div>
+          <h3>Geometry and discretization</h3>
+          <p>The high-resolution grids subdivide each source element into 4 × 4 × 4 elements. Child elements inherit the binary material indicator. Physical array sizes vary with domain shape.</p>
+          <div class="table-wrap"><table class="grid-table">
+            <caption>High-resolution element grids, in x, y, z order</caption>
+            <thead><tr><th scope="col">Grid dimensions</th><th scope="col">Elements</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">480 × 80 × 80</th><td>3,072,000</td></tr>
+              <tr><th scope="row">128 × 128 × 128</th><td>2,097,152</td></tr>
+              <tr><th scope="row">240 × 160 × 80</th><td>3,072,000</td></tr>
+              <tr><th scope="row">160 × 160 × 80</th><td>2,048,000</td></tr>
+              <tr><th scope="row">480 × 160 × 40</th><td>3,072,000</td></tr>
+              <tr><th scope="row">320 × 160 × 60</th><td>3,072,000</td></tr>
+              <tr><th scope="row">256 × 128 × 64</th><td>2,097,152</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+        <aside class="dataset-facts" aria-label="Dataset organization">
+          <h3>Data organization</h3>
+          <dl>
+            <dt>File format</dt><dd>Compressed NumPy archives, <code>.npz</code></dd>
+            <dt>Geometry</dt><dd>Binary element density, solid or artificial void</dd>
+            <dt>Inputs</dt><dd>Geometry, exact nodal forces, and component-wise zero-displacement constraints</dd>
+            <dt>Targets</dt><dd>u<sub>x</sub>, u<sub>y</sub>, u<sub>z</sub>, equivalent strain, and von Mises stress at nodes</dd>
+            <dt>Storage</dt><dd>Eight division folders. Divisions are storage shards, not train/test partitions.</dd>
+          </dl>
+          <a class="text-link" href="dataset-guide.txt" download><i data-lucide="download" aria-hidden="true"></i>Download data guide</a>
+        </aside>
+      </div>
+
+      <div class="dataset-subsection">
+        <h3>Files and fields</h3>
+        <p>For example, <code>tpi3dtop_093169_tpi3dtop.npz</code> stores the optimized geometry, while <code>tpi3dtop_093169_solid.npz</code> stores its fully solid counterpart. Both variants are not necessarily available for every identifier. Arrays are read with <code>numpy.load(..., allow_pickle=False)</code>.</p>
+        <div class="table-wrap" role="region" aria-label="Dataset array schema" tabindex="0"><table class="schema-table">
+          <caption>Compact nodal archive contents</caption>
+          <thead><tr><th scope="col">Array key</th><th scope="col">Shape / type</th><th scope="col">Contents</th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><code>density_zyx_uint8</code></th><td>[N<sub>z</sub>, N<sub>y</sub>, N<sub>x</sub>], uint8</td><td>Element density, 0 for artificial void and 1 for solid</td></tr>
+            <tr><th scope="row"><code>element_valid_shape_zyx</code></th><td>[3], int32</td><td>Physical element-grid dimensions</td></tr>
+            <tr><th scope="row"><code>force_indices_zyx</code></th><td>[N<sub>load</sub>, 3], int32</td><td>Indices of loaded nodes</td></tr>
+            <tr><th scope="row"><code>force_values_xyz</code></th><td>[N<sub>load</sub>, 3], float32</td><td>Nodal force components F<sub>x</sub>, F<sub>y</sub>, F<sub>z</sub></td></tr>
+            <tr><th scope="row"><code>fixed_indices_zyx</code></th><td>[N<sub>support</sub>, 3], int32</td><td>Indices of support nodes</td></tr>
+            <tr><th scope="row"><code>fixed_values_xyz_uint8</code></th><td>[N<sub>support</sub>, 3], uint8</td><td>Component-wise zero-displacement indicators</td></tr>
+            <tr><th scope="row"><code>valid_shape_zyx</code></th><td>[3], int32</td><td>Physical nodal dimensions, excluding padding</td></tr>
+            <tr><th scope="row"><code>padded_shape_zyx</code></th><td>[3], int32</td><td>Stored nodal dimensions</td></tr>
+            <tr><th scope="row"><code>target</code></th><td>[5, D<sub>z</sub>, D<sub>y</sub>, D<sub>x</sub>], float32</td><td>Channels 0 to 4: u<sub>x</sub>, u<sub>y</sub>, u<sub>z</sub>, ε<sub>eq</sub>, σ<sub>vm</sub></td></tr>
+            <tr><th scope="row"><code>metadata</code></th><td>JSON text</td><td>Case description and retained FEM information</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="dataset-subsection reading-grid">
+        <div>
+          <h3>Coordinates and padding</h3>
+          <p>Spatial array axes and sparse indices use <strong>z, y, x</strong>. Force and displacement components use <strong>x, y, z</strong>. An N<sub>z</sub> × N<sub>y</sub> × N<sub>x</sub> element grid has (N<sub>z</sub> + 1) × (N<sub>y</sub> + 1) × (N<sub>x</sub> + 1) physical nodes.</p>
+          <p>Target arrays include zero padding at the high-index end of each axis, to multiples of 16. Crop using <code>valid_shape_zyx</code>. Zero-valued responses cannot be used to identify padding or supports.</p>
+        </div>
+        <div class="code-example">
+          <h3>Reading a sample</h3>
+          <pre><code>import numpy as np
+
+with np.load("sample.npz", allow_pickle=False) as data:
+    nz, ny, nx = map(int, data["valid_shape_zyx"])
+    fields = data["target"][:, :nz, :ny, :nx].copy()
+    ux, uy, uz, equivalent_strain, vm_stress = fields</code></pre>
+          <p class="note">The scalar fields are recovered nodal invariants, not the six strain or stress tensor components.</p>
+        </div>
+      </div>
+
+      <div class="dataset-subsection cohort-layout">
+        <div class="dataset-cohort">
+          <h3>Study population and partitions</h3>
+          <p>The high-resolution study considered 76,901 audited samples. Displacement-RMS screening from 10<sup>−3</sup> to 1 retained 75,114 cases. All 1,787 exclusions were above the upper bound. No audited case was below the lower bound. Screening selects samples without rescaling their stored fields.</p>
+          <p>Available variants and resolutions of a source identity remain in the same partition. The published manifests define the training, validation, and test sets. A division folder or a <code>training_samples</code> directory is not itself a train/test assignment.</p>
+          <p class="note">Population and partition counts refer to the response-screened high-resolution study cohort.</p>
+        </div>
+        <div class="table-wrap"><table class="cohort-table">
+          <caption>High-resolution study selection</caption>
+          <thead><tr><th scope="col">Selection / partition</th><th scope="col">Samples</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Audited HR samples</th><td>76,901</td></tr>
+            <tr><th scope="row">Excluded: displacement RMS &gt; 1</th><td>1,787</td></tr>
+            <tr><th scope="row">Retained for the study</th><td>75,114</td></tr>
+            <tr><th scope="row">Training</th><td>60,114</td></tr>
+            <tr><th scope="row">Validation</th><td>7,512</td></tr>
+            <tr><th scope="row">Testing</th><td>7,488</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="dataset-subsection reading-grid">
+        <div>
+          <h3>FEM conventions and units</h3>
+          <p>Reference solutions use trilinear hexahedral Q1 elements, eight Gauss points per element, and isotropic linear elasticity. Reference Young’s modulus is E<sub>0</sub> = 1 Pa, Poisson ratio is 0.30, and artificial void stiffness is 10<sup>−6</sup> times the baseline stiffness. High-resolution voxel spacing is 0.25 m in this benchmark unit system.</p>
+          <p>Stored displacements are in metres, strain is dimensionless, and stress is in Pa. Targets are not per-sample normalized or logarithmically transformed. The scalar invariants are computed at Gauss points, averaged over each element, and then averaged from incident elements to nodes.</p>
+          <p>These responses solve the linearized elasticity equations. Cases with large local strains are computational benchmark responses rather than physically validated large-deformation states.</p>
+        </div>
+        <div class="dataset-details">
+          <h3>Source data and boundary conditions</h3>
+          <p>Domain dimensions, optimized geometries, load directions, and constrained components originate from <a href="https://github.com/Lyleregenwetter/NITO-3D" target="_blank" rel="noopener noreferrer">NITO-3D</a>. On non-cubic domains, axis-wise position mapping differs from the source’s common-length normalization. The released FEM fields correspond to the stored sparse nodal forces and support arrays.</p>
+          <p>Forces are nodal resultants, not pressures. Support indicators constrain individual displacement components. Zero displacement at a support does not imply zero stress or strain.</p>
+          <p>Padding, free degrees of freedom, and the material-region evaluation mask serve different purposes. Reproducing the FEM operator requires the original weak-material elements as well as the stored loads and constraints.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-band" id="explore" aria-labelledby="explore-heading"><div class="content section">
+      <h2 id="explore-heading">Example fields</h2>
+      <p class="section-intro">Archived FEM fields and model predictions for four topology-optimized high-resolution test cases.</p>
+      <div class="explorer-toolbar">
+        <div class="field-tabs" role="group" aria-label="Mechanical field">
+          <button type="button" data-field="displacement" aria-pressed="false">Displacement</button>
+          <button type="button" data-field="strain" aria-pressed="false">Strain</button>
+          <button type="button" data-field="stress" aria-pressed="true">Stress</button>
+        </div>
+        <div class="viewer-tools"><label for="case-select">Source case</label><select id="case-select"><option value="094110">094110</option><option value="038361">038361</option><option value="037544">037544</option><option value="059272">059272</option></select><button class="icon-button" id="reset-view" title="Reset camera" aria-label="Reset camera"><i data-lucide="rotate-ccw" aria-hidden="true"></i></button><button class="icon-button" id="rotate-view" title="Toggle rotation" aria-label="Toggle rotation" aria-pressed="false"><i data-lucide="rotate-3d" aria-hidden="true"></i></button></div>
+      </div>
+      <div class="comparison" id="comparison" aria-label="Interactive FEM and 3DSolidFormer surface fields"><div class="comparison-labels"><span>FEM</span><span>3DSolidFormer</span></div><div class="render-status" role="status">Loading surface data…</div></div>
+      <div class="legend-row"><span id="field-symbol">σ<sub>vm</sub> / E<sub>0</sub></span><div class="legend"><div class="legend-ramp" id="legend-ramp"></div><div class="legend-ticks"><span>0</span><span id="tick-1">8 × 10⁻³</span><span id="tick-2">0.08</span><span id="tick-3">0.8</span></div></div><span class="dimension-tag" id="mesh-dimensions">128 × 128 × 128 elements</span></div>
+      <p class="note reference-scales">Displayed quantities are |u|/L<sub>0</sub>, ε<sub>eq</sub>, and σ<sub>vm</sub>/E<sub>0</sub>, with L<sub>0</sub> = 1 m and E<sub>0</sub> = 1 Pa. Color limits are shared across cases.</p>
+      <details class="figure-note"><summary>Surface representation and color scale</summary><p>Original nodal values are sampled onto topology-preserving, simplified and Taubin-smoothed display surfaces. The source FEM fields are unchanged. Gray regions mark constrained surface nodes. Colors use log<sub>10</sub>(1 + q/q<sub>0</sub>), with q<sub>0</sub> = 0.001 q<sub>max</sub>. Ticks show original dimensionless field values. These display surfaces are not simulation meshes.</p></details>
+    </div></section>
+
+    <section class="section content" id="method" aria-labelledby="method-heading">
+      <h2 id="method-heading">Model and evaluation</h2>
+      <p class="section-intro">3DSolidFormer combines a residual 3D U-Net, global bottleneck attention, and task-specific local-window attention heads. Seven nodal input channels encode density, three force components, and three support indicators. The model returns the three displacement components, equivalent strain, and von Mises stress. Prescribed displacement components are set to zero.</p>
+      <div class="table-wrap" id="results"><table class="results-table">
+        <caption>Median case-level errors over 7,488 high-resolution test cases</caption>
+        <thead><tr><th scope="col">Field</th><th scope="col">Relative L<sub>2</sub> error</th><th scope="col">PMAE</th><th scope="col">PPAE</th></tr></thead>
+        <tbody><tr><th scope="row">Displacement</th><td>0.1172</td><td>1.33%</td><td>7.59%</td></tr><tr><th scope="row">Equivalent strain</th><td>0.1475</td><td>0.153%</td><td>7.70%</td></tr><tr><th scope="row">von Mises stress</th><td>0.1448</td><td>0.151%</td><td>7.53%</td></tr></tbody>
+      </table></div>
+      <p class="note">Displacement relative L<sub>2</sub> error uses signed Cartesian components. Displacement PMAE and PPAE use magnitude. Scalar metrics use nodal density ≥ 0.5. Load and support nodes, together with padding, are excluded from these field errors.</p>
+      <details class="metric-definitions"><summary>Error definitions</summary><dl><dt>Relative L<sub>2</sub> error</dt><dd>‖prediction − reference‖<sub>2</sub> / ‖reference‖<sub>2</sub></dd><dt>Percentage mean absolute error, PMAE</dt><dd>100 × mean(|prediction − reference|) / (reference maximum − reference minimum)</dd><dt>Percentage peak absolute error, PPAE</dt><dd>100 × |predicted maximum − reference maximum| / reference maximum</dd></dl></details>
+      <p class="timing-note">Median network evaluation time was 0.412 s per high-resolution case in FP32 on one Tesla V100 GPU. Timing used 20 cases, two warm-up iterations, and five repetitions per case, excluding data loading and host-to-device transfer.</p>
+    </section>
+
+    <section class="section-band" id="resources" aria-labelledby="resources-heading"><div class="section content contact-grid">
+      <div>
+        <h2 id="resources-heading">Contact and citation</h2>
+        <p>David Guirguis<br>Department of Mechanical Engineering<br>Southern Methodist University, Dallas, Texas</p>
+        <div class="contact-links"><a href="https://additiveintel.ai" target="_blank" rel="noopener noreferrer">Additive Intelligence Lab <i data-lucide="arrow-up-right" aria-hidden="true"></i></a><a href="mailto:dguirguis@smu.edu">dguirguis@smu.edu <i data-lucide="mail" aria-hidden="true"></i></a></div>
+      </div>
+      <div class="citation-block"><div class="citation-heading"><h3>Project citation</h3><button class="icon-button" id="copy-citation" title="Copy citation" aria-label="Copy citation"><i data-lucide="copy" aria-hidden="true"></i></button></div><p>Guirguis, D. (2026) <em>3DSolidFormer for high-resolution full-field prediction in three-dimensional linear elasticity.</em> : <a href="https://doi.org/10.21203/rs.3.rs-11494084/v2" target="_blank" rel="noopener noreferrer">https://doi.org/10.21203/rs.3.rs-11494084/v2</a></p><span id="copy-status" role="status"></span></div>
+    </div></section>
+  </main>
+  <footer class="content footer"><span>3DSolidFormer · Additive Intelligence Lab</span><a href="dataset-guide.txt">Dataset documentation</a></footer>
+  <noscript><p class="noscript">The interactive fields require JavaScript. Dataset documentation and research information remain available.</p></noscript>
+</body>
+</html>

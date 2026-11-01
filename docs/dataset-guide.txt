@@ -1,0 +1,183 @@
+3DSolidFormer Nodal Linear Elasticity Dataset
+===========================================
+
+Dataset access: https://bit.ly/3DSolidFormer
+Laboratory: https://additiveintel.ai
+Contact: dguirguis@smu.edu
+
+1. Dataset contents
+-------------------
+Each compressed NumPy archive defines one voxel-domain boundary-value problem
+and its finite-element response. Geometry, exact nodal forces, component-wise
+displacement constraints, and five nodal target fields are stored together.
+Files can be read with NumPy, without a GPU or a training framework.
+
+Example names:
+  tpi3dtop_093169_tpi3dtop.npz  topology-optimized material distribution
+  tpi3dtop_093169_solid.npz     fully solid rectangular domain
+
+The number is the source identity. A fully solid counterpart is not available
+for every optimized case. Eight division folders are storage shards, not
+training, validation, or test partitions.
+
+2. Compact nodal archive schema
+-------------------------------
+Key                         Type       Shape
+density_zyx_uint8           uint8      [Nz, Ny, Nx]
+element_valid_shape_zyx     int32      [3]
+force_indices_zyx           int32      [Nload, 3]
+force_values_xyz            float32    [Nload, 3]
+fixed_indices_zyx           int32      [Nsupport, 3]
+fixed_values_xyz_uint8      uint8      [Nsupport, 3]
+valid_shape_zyx             int32      [3]
+padded_shape_zyx            int32      [3]
+target                      float32    [5, Dz, Dy, Dx]
+metadata                    JSON text  scalar
+
+An archive can also contain a sample_format string identifying its format.
+Read the archive keys and shape arrays rather than assuming a cubic grid.
+
+density_zyx_uint8 is ELEMENT-based binary geometry: 0 is artificial void,
+1 is solid. target is NODE-based. Its channels are, in order:
+  0: ux, displacement in x
+  1: uy, displacement in y
+  2: uz, displacement in z
+  3: equivalent deviatoric strain
+  4: von Mises stress
+
+The scalar channels are not the six tensor components. Displacement magnitude
+is sqrt(ux**2 + uy**2 + uz**2), not an additional stored target channel.
+
+3. Coordinates, dimensions, and padding
+---------------------------------------
+Spatial array axes and sparse indices: z, y, x.
+Force and displacement components: x, y, z.
+Indices are zero-based. Do not reverse vector components when transposing
+spatial arrays. Metadata keys ending in _xyz use x, y, z order.
+
+An [Nz, Ny, Nx] element grid has [Nz+1, Ny+1, Nx+1] physical nodes.
+For voxel spacing h, node [k,j,i] is at (x,y,z) = (i*h,j*h,k*h).
+
+High-resolution element grids, listed in x, y, z order:
+  480 x  80 x 80     3,072,000 elements
+  128 x 128 x 128    2,097,152 elements
+  240 x 160 x 80     3,072,000 elements
+  160 x 160 x 80     2,048,000 elements
+  480 x 160 x 40     3,072,000 elements
+  320 x 160 x 60     3,072,000 elements
+  256 x 128 x 64     2,097,152 elements
+Counts include solid and artificial-void elements, not tensor padding.
+
+Stored targets have high-index zero padding to multiples of 16, for the
+four downsampling stages used by the network. Padding adds no physical nodes.
+For example, [81,161,161] physical nodes occupy [96,176,176] stored entries.
+
+Read a physical target array as follows:
+
+  import numpy as np
+
+  with np.load("sample.npz", allow_pickle=False) as data:
+      nz, ny, nx = map(int, data["valid_shape_zyx"])
+      fields = data["target"][:, :nz, :ny, :nx].copy()
+      ux, uy, uz, equivalent_strain, vm_stress = fields
+
+Never identify padding from target != 0. Zero responses can be valid.
+Density 0 is artificial void inside the FEM domain, not padding.
+
+4. Forces and supports
+-----------------------
+force_indices_zyx identifies loaded nodes. Each force_values_xyz row is the
+exact nodal force vector, not a pressure or the total force for every node.
+The prescribed resultant force norm is 1 N in the generation convention.
+Sum the stored force vectors to obtain the resultant. Do not divide the
+stored values by patch size again or assign the resultant at every node.
+
+fixed_indices_zyx identifies support nodes. The three entries of each
+fixed_values_xyz_uint8 row specify whether ux, uy, or uz is fixed to zero.
+A zero entry means that component is not constrained by that support entry.
+Zero displacement at a support does not imply zero stress or strain.
+
+5. FEM formulation and units
+-----------------------------
+The reference model uses infinitesimal-strain isotropic linear elasticity,
+eight-node trilinear hexahedral Q1 elements, and 2 x 2 x 2 Gauss quadrature.
+
+Generation reference values:
+  Reference Young's modulus E0:  1 Pa
+  Poisson ratio:                 0.30
+  Residual stiffness eta:        1e-6
+  Density exponent p:            1
+  Low-resolution spacing:        1 m
+  High-resolution spacing:       0.25 m
+
+Use the spacing and retained solver information stored with each file.
+The binary element constitutive law is C_e = (eta + rho_e**p) C0.
+Thus artificial void has stiffness eta*C0 and solid has (1+eta)*C0.
+The weak-material elements remain in the FEM operator.
+
+Displacement is stored in metres, equivalent strain is dimensionless, and
+stress is stored in Pa in this benchmark unit system. The reference scales
+are not a calibrated engineering material and specimen size. Stored targets
+are not RMS-normalized, standardized, or logarithmically transformed.
+
+Equivalent strain is sqrt((2/3) * dev(epsilon):dev(epsilon)).
+Von Mises stress is sqrt((3/2) * dev(sigma):dev(sigma)).
+Tensor shear components, not engineering shear strains, are used.
+Each invariant is evaluated at the Gauss points, averaged over the element,
+then averaged from incident elements to each node. These are recovered nodal
+invariants, not invariants calculated from an averaged nodal tensor.
+
+The responses solve the linearized elasticity equations. Cases exhibiting
+large local strains are computational benchmark responses rather than
+physically validated large-deformation states.
+
+6. Study selection and split
+-----------------------------
+Audited high-resolution samples:          76,901
+Excluded, displacement RMS above 1:        1,787
+Retained for the study:                   75,114
+Training:                                60,114
+Validation:                               7,512
+Testing:                                  7,488
+
+The study screen was 1e-3 <= displacement RMS <= 1, computed using all valid
+displacement components, excluding padding. No audited high-resolution sample
+was below the lower bound. Screening selects files without rescaling targets.
+Population and split counts refer to the response-screened study cohort.
+
+Keep all available variants and resolutions of one source identity in the
+same partition. Use the source-grouped study manifests for comparisons with
+the reported results. Storage-division membership does not define a split.
+
+7. Masks and evaluation
+------------------------
+Valid-node masks exclude padding. Free-DOF masks additionally remove fixed
+displacement components. Material-region masks and error-evaluation masks
+are separate from these masks and must be stated when reporting metrics.
+
+For the reported field errors, loaded and supported nodes are excluded.
+Displacement uses the remaining valid domain. Scalar metrics also require
+nodal density >= 0.5. Nodal density is the average of incident element densities.
+Excluding a node from a metric does not alter its stored FEM fields.
+
+For equilibrium checks, use K*u-F on valid FREE components. Include applied
+loads on free components even though load nodes are omitted from field-error
+metrics. Constrained-component residuals represent support reactions.
+Operator reproduction requires matching connectivity, quadrature, spacing,
+material weighting, forces, and constrained components. A residual tolerance
+is not an error bound on the displacement, strain, or stress fields.
+
+8. Source definitions
+-----------------------
+Geometry and source problem definitions originate from NITO-3D:
+https://github.com/Lyleregenwetter/NITO-3D
+
+Domain dimensions, optimized geometries, load directions, and constrained
+components were retained. Load/support positions were mapped independently
+along each axis, rather than using the source's common-length normalization.
+On non-cubic domains, this changes their positions. FEM responses were solved
+for the stored mapped problems. Some support patches lie inside the domain
+or intersect artificial void. Reproduce each case from its sparse nodal arrays.
+
+The display meshes on the website are smoothed surface representations.
+They are not substitutes for the voxel grids and nodal arrays in these files.
