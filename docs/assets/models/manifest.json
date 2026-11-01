@@ -1,0 +1,281 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "038361",
+      "file": "case-038361.bin",
+      "arrays": {
+        "position": {
+          "offset": 0,
+          "length": 75006,
+          "type": "float32"
+        },
+        "normal": {
+          "offset": 300024,
+          "length": 75006,
+          "type": "float32"
+        },
+        "index": {
+          "offset": 600048,
+          "length": 150000,
+          "type": "uint32"
+        },
+        "displacement_fem": {
+          "offset": 1200048,
+          "length": 25002,
+          "type": "float32"
+        },
+        "displacement_prediction": {
+          "offset": 1300056,
+          "length": 25002,
+          "type": "float32"
+        },
+        "strain_fem": {
+          "offset": 1400064,
+          "length": 25002,
+          "type": "float32"
+        },
+        "strain_prediction": {
+          "offset": 1500072,
+          "length": 25002,
+          "type": "float32"
+        },
+        "stress_fem": {
+          "offset": 1600080,
+          "length": 25002,
+          "type": "float32"
+        },
+        "stress_prediction": {
+          "offset": 1700088,
+          "length": 25002,
+          "type": "float32"
+        },
+        "support": {
+          "offset": 1800096,
+          "length": 25002,
+          "type": "float32"
+        }
+      },
+      "vertices": 25002,
+      "triangles": 50000,
+      "elements_xyz": [
+        128,
+        128,
+        128
+      ],
+      "surface": "Display-only topology-preserving simplification and Taubin smoothing; original nodal fields sampled before smoothing."
+    },
+    {
+      "id": "059272",
+      "file": "case-059272.bin",
+      "arrays": {
+        "position": {
+          "offset": 0,
+          "length": 75000,
+          "type": "float32"
+        },
+        "normal": {
+          "offset": 300000,
+          "length": 75000,
+          "type": "float32"
+        },
+        "index": {
+          "offset": 600000,
+          "length": 150000,
+          "type": "uint32"
+        },
+        "displacement_fem": {
+          "offset": 1200000,
+          "length": 25000,
+          "type": "float32"
+        },
+        "displacement_prediction": {
+          "offset": 1300000,
+          "length": 25000,
+          "type": "float32"
+        },
+        "strain_fem": {
+          "offset": 1400000,
+          "length": 25000,
+          "type": "float32"
+        },
+        "strain_prediction": {
+          "offset": 1500000,
+          "length": 25000,
+          "type": "float32"
+        },
+        "stress_fem": {
+          "offset": 1600000,
+          "length": 25000,
+          "type": "float32"
+        },
+        "stress_prediction": {
+          "offset": 1700000,
+          "length": 25000,
+          "type": "float32"
+        },
+        "support": {
+          "offset": 1800000,
+          "length": 25000,
+          "type": "float32"
+        }
+      },
+      "vertices": 25000,
+      "triangles": 50000,
+      "elements_xyz": [
+        128,
+        128,
+        128
+      ],
+      "surface": "Display-only topology-preserving simplification and Taubin smoothing; original nodal fields sampled before smoothing."
+    },
+    {
+      "id": "094110",
+      "file": "case-094110.bin",
+      "arrays": {
+        "position": {
+          "offset": 0,
+          "length": 74988,
+          "type": "float32"
+        },
+        "normal": {
+          "offset": 299952,
+          "length": 74988,
+          "type": "float32"
+        },
+        "index": {
+          "offset": 599904,
+          "length": 150000,
+          "type": "uint32"
+        },
+        "displacement_fem": {
+          "offset": 1199904,
+          "length": 24996,
+          "type": "float32"
+        },
+        "displacement_prediction": {
+          "offset": 1299888,
+          "length": 24996,
+          "type": "float32"
+        },
+        "strain_fem": {
+          "offset": 1399872,
+          "length": 24996,
+          "type": "float32"
+        },
+        "strain_prediction": {
+          "offset": 1499856,
+          "length": 24996,
+          "type": "float32"
+        },
+        "stress_fem": {
+          "offset": 1599840,
+          "length": 24996,
+          "type": "float32"
+        },
+        "stress_prediction": {
+          "offset": 1699824,
+          "length": 24996,
+          "type": "float32"
+        },
+        "support": {
+          "offset": 1799808,
+          "length": 24996,
+          "type": "float32"
+        }
+      },
+      "vertices": 24996,
+      "triangles": 50000,
+      "elements_xyz": [
+        128,
+        128,
+        128
+      ],
+      "surface": "Display-only topology-preserving simplification and Taubin smoothing; original nodal fields sampled before smoothing."
+    },
+    {
+      "id": "037544",
+      "file": "case-037544.bin",
+      "arrays": {
+        "position": {
+          "offset": 0,
+          "length": 74994,
+          "type": "float32"
+        },
+        "normal": {
+          "offset": 299976,
+          "length": 74994,
+          "type": "float32"
+        },
+        "index": {
+          "offset": 599952,
+          "length": 150000,
+          "type": "uint32"
+        },
+        "displacement_fem": {
+          "offset": 1199952,
+          "length": 24998,
+          "type": "float32"
+        },
+        "displacement_prediction": {
+          "offset": 1299944,
+          "length": 24998,
+          "type": "float32"
+        },
+        "strain_fem": {
+          "offset": 1399936,
+          "length": 24998,
+          "type": "float32"
+        },
+        "strain_prediction": {
+          "offset": 1499928,
+          "length": 24998,
+          "type": "float32"
+        },
+        "stress_fem": {
+          "offset": 1599920,
+          "length": 24998,
+          "type": "float32"
+        },
+        "stress_prediction": {
+          "offset": 1699912,
+          "length": 24998,
+          "type": "float32"
+        },
+        "support": {
+          "offset": 1799904,
+          "length": 24998,
+          "type": "float32"
+        }
+      },
+      "vertices": 24998,
+      "triangles": 50000,
+      "elements_xyz": [
+        240,
+        160,
+        80
+      ],
+      "surface": "Display-only topology-preserving simplification and Taubin smoothing; original nodal fields sampled before smoothing."
+    }
+  ],
+  "fields": {
+    "displacement": {
+      "label": "Displacement magnitude",
+      "symbol": "|u| / L0",
+      "max": 3.0,
+      "q0": 0.003
+    },
+    "strain": {
+      "label": "Equivalent strain",
+      "symbol": "epsilon_eq",
+      "max": 0.8,
+      "q0": 0.0008
+    },
+    "stress": {
+      "label": "von Mises stress",
+      "symbol": "sigma_vm / E0",
+      "max": 0.8,
+      "q0": 0.0008
+    }
+  }
+}
